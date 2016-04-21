@@ -449,8 +449,7 @@ plots.supplyDefaults = function(gd) {
         newData = gd.data || [],
         modules = gd._modules = [];
 
-    var i, trace, fullTrace, _module, axList, ax;
-
+    var i, trace, _module, axList, ax;
 
     // first fill in what we can of layout without looking at data
     // because fullData needs a few things from layout
@@ -460,24 +459,7 @@ plots.supplyDefaults = function(gd) {
     newFullLayout._dataLength = newData.length;
 
     // then do the data
-    for(i = 0; i < newData.length; i++) {
-        trace = newData[i];
-
-        fullTrace = plots.supplyDataDefaults(trace, i, newFullLayout);
-        newFullData.push(fullTrace);
-
-        // detect plot type
-        if(plots.traceIs(fullTrace, 'cartesian')) newFullLayout._hasCartesian = true;
-        else if(plots.traceIs(fullTrace, 'gl3d')) newFullLayout._hasGL3D = true;
-        else if(plots.traceIs(fullTrace, 'geo')) newFullLayout._hasGeo = true;
-        else if(plots.traceIs(fullTrace, 'pie')) newFullLayout._hasPie = true;
-        else if(plots.traceIs(fullTrace, 'gl2d')) newFullLayout._hasGL2D = true;
-        else if(plots.traceIs(fullTrace, 'ternary')) newFullLayout._hasTernary = true;
-        else if('r' in fullTrace) newFullLayout._hasPolar = true;
-
-        _module = fullTrace._module;
-        if(_module && modules.indexOf(_module)===-1) modules.push(_module);
-    }
+    plots.supplyDataDefaults(newData, newFullData, newFullLayout, modules);
 
     // special cases that introduce interactions between traces
     for(i = 0; i < modules.length; i++) {
@@ -609,7 +591,53 @@ function relinkPrivateKeys(toLayout, fromLayout) {
     }
 }
 
-plots.supplyDataDefaults = function(traceIn, i, layout) {
+plots.supplyDataDefaults = function(dataIn, dataOut, layout, modules) {
+    var cnt = 0;
+
+    // push to array if item isn't already in array
+    function fill(arr, item) {
+        if(item && arr.indexOf(item) === -1) return arr.push(item);
+    }
+
+    // detect plot type
+    function detect(trace) {
+        if(plots.traceIs(trace, 'cartesian')) layout._hasCartesian = true;
+        else if(plots.traceIs(trace, 'gl3d')) layout._hasGL3D = true;
+        else if(plots.traceIs(trace, 'geo')) layout._hasGeo = true;
+        else if(plots.traceIs(trace, 'pie')) layout._hasPie = true;
+        else if(plots.traceIs(trace, 'gl2d')) layout._hasGL2D = true;
+        else if(plots.traceIs(trace, 'ternary')) layout._hasTernary = true;
+        else if('r' in trace) layout._hasPolar = true;
+    }
+
+    for(var i = 0; i < dataIn.length; i++) {
+        var trace = dataIn[i];
+
+        var fullTrace = plots.supplyTraceDefaults(trace, cnt, layout);
+
+        if(fullTrace._module && fullTrace._module.expandData) {
+            var expandedTraces = fullTrace._module.expandData(fullTrace, layout);
+
+            for(var j = 0; j < expandedTraces.length; j++) {
+                var expandedTrace = expandedTraces[j];
+                var fullExpandedTrace = plots.supplyTraceDefaults(expandedTrace, cnt, layout);
+
+                fill(dataOut, fullExpandedTrace);
+                fill(modules, fullExpandedTrace._module);
+                detect(fullExpandedTrace);
+                cnt++;
+            }
+        }
+        else {
+            fill(dataOut, fullTrace);
+            fill(modules, fullTrace._module);
+            detect(trace);
+            cnt++;
+        }
+    }
+};
+
+plots.supplyTraceDefaults = function(traceIn, i, layout) {
     var traceOut = {},
         defaultColor = Color.defaults[i % Color.defaults.length];
 
