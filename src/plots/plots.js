@@ -21,7 +21,8 @@ var plots = module.exports = {};
 var modules = plots.modules = {},
     allTypes = plots.allTypes = [],
     allCategories = plots.allCategories = {},
-    subplotsRegistry = plots.subplotsRegistry = {};
+    subplotsRegistry = plots.subplotsRegistry = {},
+    transformsRegistry = plots.transformsRegistry = {};
 
 plots.attributes = require('./attributes');
 plots.attributes.type.values = allTypes;
