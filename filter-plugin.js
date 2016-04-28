@@ -2,6 +2,8 @@
 
 var Lib = require('./src/lib');
 
+/*eslint no-unused-vars: 0*/
+
 
 // so that Plotly.register knows what to do with it
 exports.moduleType = 'transform';
@@ -36,6 +38,7 @@ exports.attributes = {
  *  the plot's full data
  * @param {object} fullLayout
  *  the plot's full layout
+ *
  * @return {object} transformOut
  *  copy of transformIn that contains attribute defaults
  */
@@ -43,7 +46,7 @@ exports.supplyDefaults = function(transformIn, fullData, fullLayout) {
     var transformOut = {};
 
     function coerce(attr, dflt) {
-        Lib.coerce(transformIn, transformOut, exports.attributes, attr, dflt)
+        Lib.coerce(transformIn, transformOut, exports.attributes, attr, dflt);
     }
 
     coerce('operation');
@@ -65,6 +68,8 @@ exports.supplyDefaults = function(transformIn, fullData, fullLayout) {
  * @param {object} fullLayout
  *  the plot's full layout
  *
+ * @return {object} dataOut
+ *  array of transformed traces
  */
 exports.transform = function(opts, fullTrace, fullLayout) {
     var filterFunc = getFilterFunc(opts);

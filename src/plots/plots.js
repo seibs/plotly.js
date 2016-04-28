@@ -723,7 +723,7 @@ function supplyTransformDefaults(traceIn, traceOut, layout) {
 
         containerOut.push(transformOut);
     }
-};
+}
 
 function applyTransforms(fullTrace, layout) {
     var container = fullTrace.transforms,
