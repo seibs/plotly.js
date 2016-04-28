@@ -616,7 +616,7 @@ plots.supplyDataDefaults = function(dataIn, dataOut, layout, modules) {
 
         var fullTrace = plots.supplyTraceDefaults(trace, cnt, layout);
 
-        if(fullTrace.transforms.length) {
+        if(fullTrace.transforms && fullTrace.transforms.length) {
             var expandedTraces = applyTransforms(fullTrace, layout);
 
             for(var j = 0; j < expandedTraces.length; j++) {
