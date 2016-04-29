@@ -1564,9 +1564,9 @@ Plotly.restyle = function restyle(gd, astr, val, traces) {
 
     if(Object.keys(aobj).length) gd.changed = true;
 
-    if(isNumeric(traces)) traces=[traces];
+    if(isNumeric(traces)) traces = [traces];
     else if(!Array.isArray(traces) || !traces.length) {
-        traces=gd._fullData.map(function(v,i) { return i; });
+        traces = gd.data.map(function(v, i) { return i; });
     }
 
     // recalcAttrs attributes need a full regeneration of calcdata
