@@ -616,6 +616,9 @@ plots.supplyDataDefaults = function(dataIn, dataOut, layout, modules) {
 
         var fullTrace = plots.supplyTraceDefaults(trace, cnt, layout);
 
+        // keep track of pre-transform _input
+        var traceIn = fullTrace._input;
+
         if(fullTrace.transforms && fullTrace.transforms.length) {
             var expandedTraces = applyTransforms(fullTrace, layout);
 
@@ -623,14 +626,19 @@ plots.supplyDataDefaults = function(dataIn, dataOut, layout, modules) {
                 var expandedTrace = expandedTraces[j];
                 var fullExpandedTrace = plots.supplyTraceDefaults(expandedTrace, cnt, layout);
 
-                fill(dataOut, fullExpandedTrace);
+                // copy refs
+                fullExpandedTrace._input = traceIn;
+                fullExpandedTrace._fullTransforms = fullTrace.transforms;
+                fullExpandedTrace._index = i;
+
+                dataOut.push(fullExpandedTrace);
                 fill(modules, fullExpandedTrace._module);
                 detect(fullExpandedTrace);
                 cnt++;
             }
         }
         else {
-            fill(dataOut, fullTrace);
+            dataOut.push(fullTrace);
             fill(modules, fullTrace._module);
             detect(trace);
             cnt++;
@@ -735,6 +743,8 @@ function applyTransforms(fullTrace, layout) {
             _module = transformsRegistry[type];
 
         dataOut = dataOut.concat(_module.transform(transform, fullTrace, layout));
+
+        // TODO need to compose transforms !!!
     }
 
     return dataOut;
