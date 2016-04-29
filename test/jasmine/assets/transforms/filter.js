@@ -1,6 +1,7 @@
 'use strict';
 
-var Lib = require('./src/lib');
+// var Lib = require('@src/lib');
+var Lib = require('../../../../src/lib');
 
 /*eslint no-unused-vars: 0*/
 
@@ -19,7 +20,7 @@ exports.attributes = {
         dflt: '='
     },
     value: {
-        valType: 'any',
+        valType: 'number',
         dflt: 0
     },
     filtersrc: {
@@ -36,24 +37,24 @@ exports.attributes = {
  *  object linked to trace.transforms[i] with 'type' set to exports.name
  * @param {object} fullData
  *  the plot's full data
- * @param {object} fullLayout
- *  the plot's full layout
+ * @param {object} layout
+ *  the plot's (not-so-full) layout
  *
  * @return {object} transformOut
  *  copy of transformIn that contains attribute defaults
  */
-exports.supplyDefaults = function(transformIn, fullData, fullLayout) {
+exports.supplyDefaults = function(transformIn, fullData, layout) {
     var transformOut = {};
 
     function coerce(attr, dflt) {
-        Lib.coerce(transformIn, transformOut, exports.attributes, attr, dflt);
+        return Lib.coerce(transformIn, transformOut, exports.attributes, attr, dflt);
     }
 
     coerce('operation');
     coerce('value');
     coerce('filtersrc');
 
-    // or some more complex logic using fullData and fullLayout
+    // or some more complex logic using fullData and layout
 
     return transformOut;
 };
@@ -65,28 +66,48 @@ exports.supplyDefaults = function(transformIn, fullData, fullLayout) {
  *  full transform options
  * @param {object} fullTrace
  *  full trace object where the transform is nested
- * @param {object} fullLayout
- *  the plot's full layout
+ * @param {object} layout
+ *  the plot's (not-so-full) layout
  *
  * @return {object} dataOut
  *  array of transformed traces
  */
-exports.transform = function(opts, fullTrace, fullLayout) {
+exports.transform = function(opts, fullTrace, layout) {
+
+    // one-to-one case
+    //
+    // TODO is this the best pattern ???
+    // maybe we could abstract this out
+    var traceOut = Lib.extendDeep({}, fullTrace);
+    delete traceOut.transforms;
+
+    traceOut.x = [];
+    traceOut.y = [];
+
     var filterFunc = getFilterFunc(opts);
 
-    // one-to-one in this case
-    var traceOut = {};
-
+    var src, opp, len;
     switch(opts.filtersrc) {
         case 'x':
-            traceOut.x = fullTrace.x.filter(filterFunc);
-            traceOut.y = fullTrace.y;
+            src = 'x';
+            opp = 'y';
+            len = fullTrace.x.length;
             break;
 
         case 'y':
-            traceOut.x = fullTrace.x;
-            traceOut.y = fullTrace.y.filter(filterFunc);
+            src = 'y';
+            opp = 'x';
+            len = fullTrace.y.length;
             break;
+    }
+
+    for(var i = 0; i < len; i++) {
+        var v = fullTrace[src][i];
+
+        if(!filterFunc(v)) continue;
+
+        traceOut[src].push(v);
+        traceOut[opp].push(fullTrace[opp][i]);
     }
 
     return [traceOut];
