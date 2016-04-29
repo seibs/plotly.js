@@ -1734,6 +1734,9 @@ Plotly.restyle = function restyle(gd, astr, val, traces) {
             continue;
         }
 
+        // take no chances on transforms
+        if(ai.substr(0, 10) === 'transforms') docalc = true;
+
         // set attribute in gd.data
         undoit[ai] = a0();
         for(i=0; i<traces.length; i++) {
