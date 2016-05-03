@@ -446,6 +446,9 @@ plots.sendDataToCloud = function(gd) {
 // gd._fullLayout._modules
 //   is a list of all the trace modules required to draw the plot
 //
+// gd._fullLayout._basePlotModules
+//   is a list of all the plot modules required to draw the plot
+//
 plots.supplyDefaults = function(gd) {
     var oldFullLayout = gd._fullLayout || {},
         newFullLayout = gd._fullLayout = {},
@@ -455,7 +458,8 @@ plots.supplyDefaults = function(gd) {
         newFullData = gd._fullData = [],
         newData = gd.data || [];
 
-    var modules = newFullLayout._modules = [];
+    var modules = newFullLayout._modules = [],
+        basePlotModules = newFullLayout._basePlotModules = [];
 
     var i, _module;
 
@@ -474,9 +478,12 @@ plots.supplyDefaults = function(gd) {
         // detect polar
         if('r' in fullTrace) newFullLayout._hasPolar = true;
 
-        // fill in modules list
         _module = fullTrace._module;
-        if(_module && modules.indexOf(_module) === -1) modules.push(_module);
+        if(!_module) continue;
+
+        // fill in module lists
+        Lib.fillUnique(modules, _module);
+        Lib.fillUnique(basePlotModules, fullTrace._module.basePlotModule);
     }
 
     // attach helper method
@@ -740,13 +747,17 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut) {
 plots.supplyLayoutModuleDefaults = function(layoutIn, layoutOut, fullData) {
     var i, _module;
 
-    // TODO incorporate into subplotsRegistry
+    // can't be be part of basePlotModules loop 
+    // in order to handle the orphan axes case
     Plotly.Axes.supplyLayoutDefaults(layoutIn, layoutOut, fullData);
 
-    // plot module layout defaults
-    var plotTypes = Object.keys(subplotsRegistry);
-    for(i = 0; i < plotTypes.length; i++) {
-        _module = subplotsRegistry[plotTypes[i]];
+    // base plot module layout defaults
+    var basePlotModules = layoutOut._basePlotModules;
+    for(i = 0; i < basePlotModules.length; i++) {
+        _module = basePlotModules[i];
+
+        // done above already
+        if(_module.name === 'cartesian') continue;
 
         // e.g. gl2d does not have a layout-defaults step
         if(_module.supplyLayoutDefaults) {
@@ -755,9 +766,9 @@ plots.supplyLayoutModuleDefaults = function(layoutIn, layoutOut, fullData) {
     }
 
     // trace module layout defaults
-    var traceTypes = Object.keys(modules);
-    for(i = 0; i < traceTypes.length; i++) {
-        _module = modules[allTypes[i]]._module;
+    var modules = layoutOut._modules
+    for(i = 0; i < modules.length; i++) {
+        _module = modules[i];
 
         if(_module.supplyLayoutDefaults) {
             _module.supplyLayoutDefaults(layoutIn, layoutOut, fullData);

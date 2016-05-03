@@ -335,6 +335,12 @@ lib.noneOrAll = function(containerIn, containerOut, attrList) {
     }
 };
 
+lib.fillUnique = function(arr, item) {
+    if(item && arr.indexOf(arr) === -1) arr.push(item);
+
+    return arr;
+}
+
 lib.mergeArray = function(traceAttr, cd, cdAttr) {
     if(Array.isArray(traceAttr)) {
         var imax = Math.min(traceAttr.length, cd.length);
