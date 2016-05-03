@@ -63,52 +63,63 @@ exports.supplyDefaults = function(transformIn, fullData, layout) {
 /**
  * Apply transform !!!
  *
- * @param {object} opts
- *  full transform options
- * @param {object} fullTrace
- *  full trace object where the transform is nested
- * @param {object} layout
- *  the plot's (not-so-full) layout
+ * @param {array} data
+ *  array of transformed traces (is [fullTrace] upon first transform)
  *
- * @return {object} dataOut
+ * @param {object} state
+ *  state object which includes:
+ *      - transform {object} full transform attributes
+ *      - fullTrace {object} full trace object which is being transformed
+ *      - fullData {array} full pre-transform(s) data array
+ *      - layout {object} the plot's (not-so-full) layout
+ *
+ * @return {object} newData
  *  array of transformed traces
  */
-exports.transform = function(opts, fullTrace, layout) {
+exports.transform = function(data, state) {
 
     // one-to-many case
 
+    var newData = [];
+
+    data.forEach(function(trace) {
+        newData = newData.concat(transformOne(trace, state));
+    });
+
+    return newData;
+};
+
+function transformOne(trace, state) {
+    var opts = state.transform;
     var groups = opts.groups;
 
     var groupNames = groups.filter(function(g, i, self) {
         return self.indexOf(g) === i;
     });
 
-    var dataOut = new Array(groupNames.length);
-    var len = Math.min(fullTrace.x.length, fullTrace.y.length, groups.length);
+    var newData = new Array(groupNames.length);
+    var len = Math.min(trace.x.length, trace.y.length, groups.length);
 
     for(var i = 0; i < groupNames.length; i++) {
         var groupName = groupNames[i];
 
         // TODO is this the best pattern ???
         // maybe we could abstract this out
-        var traceOut = dataOut[i] = Lib.extendDeep({}, fullTrace);
+        var newTrace = newData[i] = Lib.extendDeep({}, trace);
 
-        traceOut.x = [];
-        traceOut.y = [];
-        delete traceOut.transforms;
+        newTrace.x = [];
+        newTrace.y = [];
 
         for(var j = 0; j < len; j++) {
             if(groups[j] !== groupName) continue;
 
-            traceOut.x.push(fullTrace.x[j]);
-            traceOut.y.push(fullTrace.y[j]);
+            newTrace.x.push(trace.x[j]);
+            newTrace.y.push(trace.y[j]);
         }
 
-        traceOut.name = groupName;
-        traceOut.marker.color = opts.groupColors[groupName];
+        newTrace.name = groupName;
+        newTrace.marker.color = opts.groupColors[groupName];
     }
 
-//     console.log(dataOut);
-
-    return dataOut;
-};
+    return newData;
+}

@@ -62,56 +62,62 @@ exports.supplyDefaults = function(transformIn, fullData, layout) {
 /**
  * Apply transform !!!
  *
- * @param {object} opts
- *  full transform options
- * @param {object} fullTrace
- *  full trace object where the transform is nested
- * @param {object} layout
- *  the plot's (not-so-full) layout
+ * @param {array} data
+ *  array of transformed traces (is [fullTrace] upon first transform)
  *
- * @return {object} dataOut
+ * @param {object} state
+ *  state object which includes:
+ *      - transform {object} full transform attributes
+ *      - fullTrace {object} full trace object which is being transformed
+ *      - fullData {array} full pre-transform(s) data array
+ *      - layout {object} the plot's (not-so-full) layout
+ *
+ * @return {object} newData
  *  array of transformed traces
  */
-exports.transform = function(opts, fullTrace, layout) {
+exports.transform = function(data, state) {
 
     // one-to-one case
-    //
-    // TODO is this the best pattern ???
-    // maybe we could abstract this out
-    var traceOut = Lib.extendDeep({}, fullTrace);
-    delete traceOut.transforms;
 
-    traceOut.x = [];
-    traceOut.y = [];
+    var newData = data.map(function(trace) {
+        return transformOne(trace, state);
+    });
 
+    return newData;
+};
+
+function transformOne(trace, state) {
+    var newTrace = Lib.extendDeep({}, trace);
+
+    var opts = state.transform;
+    var src = opts.filtersrc;
     var filterFunc = getFilterFunc(opts);
+    var len = trace[src].length;
+    var arrayAttrs = findArrayAttributes(trace);
 
-    var src, opp, len;
-    switch(opts.filtersrc) {
-        case 'x':
-            src = 'x';
-            opp = 'y';
-            len = fullTrace.x.length;
-            break;
+    arrayAttrs.forEach(function(attr) {
+        Lib.nestedProperty(newTrace, attr).set([]);
+    });
 
-        case 'y':
-            src = 'y';
-            opp = 'x';
-            len = fullTrace.y.length;
-            break;
+    function fill(attr, i) {
+        var arr = Lib.nestedProperty(trace, attr).get();
+        var newArr = Lib.nestedProperty(newTrace, attr).get();
+
+        newArr.push(arr[i]);
     }
 
     for(var i = 0; i < len; i++) {
-        var v = fullTrace[src][i];
+        var v = trace[src][i];
 
         if(!filterFunc(v)) continue;
 
-        traceOut[src].push(v);
-        traceOut[opp].push(fullTrace[opp][i]);
+        for(var j = 0; j < arrayAttrs.length; j++) {
+            fill(arrayAttrs[j], i);
+        }
     }
 
-    return [traceOut];
-};
+    return newTrace;
+}
 
 function getFilterFunc(opts) {
     var value = opts.value;
@@ -124,4 +130,32 @@ function getFilterFunc(opts) {
         case '>':
             return function(v) { return v > value; };
     }
+}
+
+function findArrayAttributes(obj, root) {
+    root = root || '';
+
+    var list = [];
+
+    Object.keys(obj).forEach(function(k) {
+        var val = obj[k];
+
+        if(k.charAt(0) === '_') return;
+
+        if(k === 'transforms') {
+            val.forEach(function(item, i) {
+                list = list.concat(
+                    findArrayAttributes(item, root + k + '[' + i + ']' + '.')
+                );
+            });
+        }
+        else if(Lib.isPlainObject(val)) {
+            list = list.concat(findArrayAttributes(val, root + k + '.'));
+        }
+        else if(Array.isArray(val)) {
+            list.push(root + k);
+        }
+    });
+
+    return list;
 }

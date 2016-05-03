@@ -620,7 +620,7 @@ plots.supplyDataDefaults = function(dataIn, dataOut, layout, modules) {
         var traceIn = fullTrace._input;
 
         if(fullTrace.transforms && fullTrace.transforms.length) {
-            var expandedTraces = applyTransforms(fullTrace, layout);
+            var expandedTraces = applyTransforms(fullTrace, dataOut, layout);
 
             for(var j = 0; j < expandedTraces.length; j++) {
                 var expandedTrace = expandedTraces[j];
@@ -733,18 +733,21 @@ function supplyTransformDefaults(traceIn, traceOut, layout) {
     }
 }
 
-function applyTransforms(fullTrace, layout) {
+function applyTransforms(fullTrace, fullData, layout) {
     var container = fullTrace.transforms,
-        dataOut = [];
+        dataOut = [fullTrace];
 
     for(var i = 0; i < container.length; i++) {
         var transform = container[i],
             type = transform.type,
             _module = transformsRegistry[type];
 
-        dataOut = dataOut.concat(_module.transform(transform, fullTrace, layout));
-
-        // TODO need to compose transforms !!!
+        dataOut = _module.transform(dataOut, {
+            transform: transform,
+            fullTrace: fullTrace,
+            fullData: fullData,
+            layout: layout
+        });
     }
 
     return dataOut;
