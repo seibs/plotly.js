@@ -1654,10 +1654,11 @@ Plotly.restyle = function restyle(gd, astr, val, traces) {
         axlist,
         flagAxForDelete = {};
 
-    // for now, if we detect gl or geo stuff, just re-do the plot
-    if(fullLayout._hasGL3D || fullLayout._hasGeo || fullLayout._hasGL2D) {
-        doplot = true;
-    }
+    // TODO ... is this correct ???
+    var doPlotWhiteList = ['cartesian', 'pie', 'ternary'];
+    fullLayout._basePlotModules.forEach(function(_module) {
+        if(doPlotWhiteList.indexOf(_module.name) === -1) doplot = true;
+    });
 
     // make a new empty vals array for undoit
     function a0() { return traces.map(function() { return undefined; }); }
