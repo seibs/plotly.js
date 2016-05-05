@@ -258,10 +258,6 @@ plots.getSubplotData = function getSubplotData(data, type, subplotId) {
 // the text is at first, so it needs to draw it,
 // then wait a little, then draw it again
 plots.redrawText = function(gd) {
-
-    // do not work for polar plots
-    if(gd._fullLayout._hasPolar) return;
-
     return new Promise(function(resolve) {
         setTimeout(function() {
             Plotly.Annotations.drawAll(gd);
@@ -476,7 +472,7 @@ plots.supplyDefaults = function(gd) {
         newFullData.push(fullTrace);
 
         // detect polar
-        if('r' in newData[i]) newFullLayout._hasPolar = true;
+        if('r' in fullTrace) newFullLayout._hasPolar = true;
 
         _module = fullTrace._module;
         if(!_module) continue;
@@ -485,8 +481,6 @@ plots.supplyDefaults = function(gd) {
         Lib.fillUnique(modules, _module);
         Lib.fillUnique(basePlotModules, fullTrace._module.basePlotModule);
     }
-
-    console.log(newFullLayout._hasPolar)
 
     // attach helper method
     oldFullLayout._has = hasPlotType.bind(oldFullLayout);

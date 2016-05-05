@@ -121,7 +121,7 @@ Plotly.plot = function(gd, data, layout, config) {
     Plots.supplyDefaults(gd);
 
     // Polar plots
-    if(gd._fullLayout._hasPolar) return plotPolar(gd, data, layout);
+    if(data && data[0] && data[0].r) return plotPolar(gd, data, layout);
 
     // so we don't try to re-call Plotly.plot from inside
     // legend and colorbar, if margins changed
