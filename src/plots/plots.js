@@ -486,14 +486,6 @@ plots.supplyDefaults = function(gd) {
     oldFullLayout._has = hasPlotType.bind(oldFullLayout);
     newFullLayout._has = hasPlotType.bind(newFullLayout);
 
-    // temporary block (before replace all _has??? with _hasPlotType() ?
-    newFullLayout._hasCartesian = newFullLayout._has('cartesian');
-    newFullLayout._hasGeo = newFullLayout._has('geo');
-    newFullLayout._hasGL3D = newFullLayout._has('gl3d');
-    newFullLayout._hasGL2D = newFullLayout._has('gl2d');
-    newFullLayout._hasTernary = newFullLayout._has('ternary');
-    newFullLayout._hasPie = newFullLayout._has('pie');
-
     // special cases that introduce interactions between traces
     for(i = 0; i < modules.length; i++) {
         _module = modules[i];
@@ -508,6 +500,15 @@ plots.supplyDefaults = function(gd) {
 
     // finally, fill in the pieces of layout that may need to look at data
     plots.supplyLayoutModuleDefaults(newLayout, newFullLayout, newFullData);
+
+    // TODO remove in v2.0.0
+    // add has-plot-type refs to fullLayout for backward compatibility
+    newFullLayout._hasCartesian = newFullLayout._has('cartesian');
+    newFullLayout._hasGeo = newFullLayout._has('geo');
+    newFullLayout._hasGL3D = newFullLayout._has('gl3d');
+    newFullLayout._hasGL2D = newFullLayout._has('gl2d');
+    newFullLayout._hasTernary = newFullLayout._has('ternary');
+    newFullLayout._hasPie = newFullLayout._has('pie');
 
     // clean subplots and other artifacts from previous plot calls
     plots.cleanPlot(newFullData, newFullLayout, oldFullData, oldFullLayout);
@@ -744,7 +745,7 @@ plots.supplyLayoutGlobalDefaults = function(layoutIn, layoutOut) {
 plots.supplyLayoutModuleDefaults = function(layoutIn, layoutOut, fullData) {
     var i, _module;
 
-    // can't be be part of basePlotModules loop 
+    // can't be be part of basePlotModules loop
     // in order to handle the orphan axes case
     Plotly.Axes.supplyLayoutDefaults(layoutIn, layoutOut, fullData);
 
