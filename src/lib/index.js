@@ -335,10 +335,10 @@ lib.noneOrAll = function(containerIn, containerOut, attrList) {
     }
 };
 
-lib.fillUnique = function(arr, item) {
-    if(item && arr.indexOf(arr) === -1) arr.push(item);
+lib.fillUnique = function(array, item) {
+    if(item && array.indexOf(item) === -1) array.push(item);
 
-    return arr;
+    return array;
 }
 
 lib.mergeArray = function(traceAttr, cd, cdAttr) {
