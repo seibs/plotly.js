@@ -483,6 +483,7 @@ plots.supplyDefaults = function(gd) {
     }
 
     // attach helper method
+    oldFullLayout._has = hasPlotType.bind(oldFullLayout);
     newFullLayout._has = hasPlotType.bind(newFullLayout);
 
     // temporary block (before replace all _has??? with _hasPlotType() ?
