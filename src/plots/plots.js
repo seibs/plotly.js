@@ -536,14 +536,14 @@ plots.supplyDefaults = function(gd) {
 };
 
 // helper function to be bound to fullLayout to check
-// whether a certain plot type or layout categories is present on plot
+// whether a certain plot type is present on plot
 function hasPlotType(category) {
-    var modules = this._modules || [];
+    var basePlotModules = this._basePlotModules || [];
 
-    for(var i = 0; i < modules.length; i++) {
-        var _module = modules[i];
+    for(var i = 0; i < basePlotModules.length; i++) {
+        var _module = basePlotModules[i];
 
-        if(_module.basePlotModule.name === category) return true;
+        if(_module.name === category) return true;
     }
 
     return false;
