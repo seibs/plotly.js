@@ -15,6 +15,10 @@ function getDelay(fullLayout) {
 }
 
 function getRedrawFunc(gd) {
+
+    // do not work for polar plots
+    if(gd._fullLayout._hasPolar) return;
+
     return function() {
         (gd.calcdata || []).forEach(function(d) {
             if(d[0] && d[0].t && d[0].t.cb) d[0].t.cb();
