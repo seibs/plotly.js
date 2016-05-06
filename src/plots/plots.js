@@ -482,8 +482,8 @@ plots.supplyDefaults = function(gd) {
         Lib.fillUnique(basePlotModules, fullTrace._module.basePlotModule);
     }
 
-    // attach helper method
-    newFullLayout._has = hasPlotType.bind(newFullLayout);
+    // attach helper method to check whether a plot type is present on graph
+    newFullLayout._has = plots._hasPlotType.bind(newFullLayout);
 
     // special cases that introduce interactions between traces
     for(i = 0; i < modules.length; i++) {
@@ -537,7 +537,7 @@ plots.supplyDefaults = function(gd) {
 
 // helper function to be bound to fullLayout to check
 // whether a certain plot type is present on plot
-function hasPlotType(category) {
+plots._hasPlotType = function(category) {
     var basePlotModules = this._basePlotModules || [];
 
     for(var i = 0; i < basePlotModules.length; i++) {
