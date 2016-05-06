@@ -21,7 +21,10 @@ exports.plot = function(gd) {
 };
 
 exports.clean = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
-    if(oldFullLayout._has('pie') && !newFullLayout._has('pie')) {
+    var hadPie = (oldFullLayout._has && oldFullLayout._has('pie'));
+    var hasPie = (newFullLayout._has && newFullLayout._has('pie'));
+
+    if(hadPie && !hasPie) {
         oldFullLayout._pielayer.selectAll('g.trace').remove();
     }
 };
