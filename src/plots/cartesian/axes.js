@@ -1797,7 +1797,7 @@ axes.doTicks = function(gd, axid, skipTitle) {
         var alldone = axes.getSubplots(gd, ax).map(function(subplot) {
             var plotinfo = fullLayout._plots[subplot];
 
-            if(!fullLayout._hasCartesian) return;
+            if(!fullLayout._has('cartesian')) return;
 
             var container = plotinfo[axletter + 'axislayer'],
 

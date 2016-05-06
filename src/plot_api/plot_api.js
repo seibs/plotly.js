@@ -2642,7 +2642,7 @@ function makePlotFramework(gd) {
         makeSubplots(gd, subplots);
     }
 
-    if(fullLayout._hasCartesian) makeCartesianPlotFramwork(gd, subplots);
+    if(fullLayout._has('cartesian')) makeCartesianPlotFramwork(gd, subplots);
 
     // single ternary layer for the whole plot
     fullLayout._ternarylayer = fullLayout._paper.append('g').classed('ternarylayer', true);
