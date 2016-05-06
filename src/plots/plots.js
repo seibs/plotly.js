@@ -472,7 +472,7 @@ plots.supplyDefaults = function(gd) {
         newFullData.push(fullTrace);
 
         // detect polar
-        if('r' in fullTrace) newFullLayout._hasPolar = true;
+        if('r' in newData[i]) continue;
 
         _module = fullTrace._module;
         if(!_module) continue;

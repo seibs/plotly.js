@@ -10,6 +10,10 @@
 'use strict';
 
 function getDelay(fullLayout) {
+
+    // polar clears fullLayout._has for some reason
+    if(!fullLayout._has) return 0;
+
     // maybe we should add a 'gl' (and 'svg') layoutCategory ??
     return (fullLayout._has('gl3d')|| fullLayout._has('gl2d')) ? 500 : 0;
 }
