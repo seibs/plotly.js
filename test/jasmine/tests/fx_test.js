@@ -15,8 +15,7 @@ describe('Test FX', function() {
                 _has: Plots._hasPlotType
             };
             fullData = [{}];
-        })
-
+        });
 
         it('should default (blank version)', function() {
             Fx.supplyLayoutDefaults(layoutIn, layoutOut, fullData);

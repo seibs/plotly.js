@@ -547,7 +547,7 @@ plots._hasPlotType = function(category) {
     }
 
     return false;
-}
+};
 
 plots.cleanPlot = function(newFullData, newFullLayout, oldFullData, oldFullLayout) {
     var i, j;
@@ -763,7 +763,7 @@ plots.supplyLayoutModuleDefaults = function(layoutIn, layoutOut, fullData) {
     }
 
     // trace module layout defaults
-    var modules = layoutOut._modules
+    var modules = layoutOut._modules;
     for(i = 0; i < modules.length; i++) {
         _module = modules[i];
 

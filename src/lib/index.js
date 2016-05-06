@@ -339,7 +339,7 @@ lib.fillUnique = function(array, item) {
     if(item && array.indexOf(item) === -1) array.push(item);
 
     return array;
-}
+};
 
 lib.mergeArray = function(traceAttr, cd, cdAttr) {
     if(Array.isArray(traceAttr)) {
