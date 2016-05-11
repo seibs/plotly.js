@@ -672,6 +672,9 @@ plots.supplyDataDefaults = function(traceIn, i, layout) {
     coerceSubplotAttr('geo', 'geo');
     coerceSubplotAttr('ternary', 'subplot');
 
+    // TODO use _module
+    coerceSubplotAttr('mapbox', 'subplot');
+
     // module-specific attributes --- note: we need to send a trace into
     // the 3D modules to have it removed from the webgl context.
     if(visible || scene) {
